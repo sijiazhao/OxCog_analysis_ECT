@@ -14,16 +14,10 @@ nTrial = 3;     % Part A: 1,2,3,4... % part = 1, iTrial = 1,2,3
 
 for s = 1:numSubjects
     filename = fullfile(fileList(s).folder,fileList(s).name);
-    %     T = readtable(filename);
     T = readtable(filename, 'Delimiter', ',');
 
-    try
     subject = T.('participantID'){1};
-    catch
-        subject = num2str(T.('participantID')(1));
-    end
     participantID = {subject};
-
 
     testTime = T.participantStartTime{1};
     testTime = strrep(testTime,'h','.');
@@ -108,6 +102,10 @@ end
 
 Q(removeIdx,:) = [];
 disp('Duplicates have been removed. Only first complete entry kept.');
+
+
+% Q.TMT_A_divide_control = Q.TMT_A./Q.TMT_control;
+% Q.TMT_B_divide_control = Q.TMT_B./Q.TMT_control;
 
 filename = fullfile('Results',['result_' chooseExperiment '.csv']);
 writetable(Q,filename);

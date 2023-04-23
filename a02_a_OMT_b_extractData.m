@@ -63,11 +63,15 @@ for s = 1:numSubjects
         %         LocalisationTime_1item_4secs = nanmean(fRemoveOutliers(r.LocalisationTime(find(r.nItem == 1))));
         %         LocalisationTime_3item_4secs = nanmean(fRemoveOutliers(r.LocalisationTime(find(r.nItem == 3))));
 
-        IdentificationTime_1item_4secs = nanmean(r.IdentificationTime(find(r.nItem == 1 & r.IdentificationResp == 1)));
-        IdentificationTime_3item_4secs = nanmean(r.IdentificationTime(find(r.nItem == 3 & r.IdentificationResp == 1)));
-        LocalisationTime_1item_4secs = nanmean(r.LocalisationTime(find(r.nItem == 1 & r.IdentificationResp == 1)));
-        LocalisationTime_3item_4secs = nanmean(r.LocalisationTime(find(r.nItem == 3 & r.IdentificationResp == 1)));
+        %         IdentificationTime_1item_4secs = nanmean(r.IdentificationTime(find(r.nItem == 1 & r.IdentificationResp == 1)));
+        %         IdentificationTime_3item_4secs = nanmean(r.IdentificationTime(find(r.nItem == 3 & r.IdentificationResp == 1)));
+        %         LocalisationTime_1item_4secs = nanmean(r.LocalisationTime(find(r.nItem == 1 & r.IdentificationResp == 1)));
+        %         LocalisationTime_3item_4secs = nanmean(r.LocalisationTime(find(r.nItem == 3 & r.IdentificationResp == 1)));
 
+        IdentificationTime_1item_4secs = nanmean(fRemoveOutliers(r.IdentificationTime(find(r.nItem == 1 & r.IdentificationResp == 1))));
+        IdentificationTime_3item_4secs = nanmean(fRemoveOutliers(r.IdentificationTime(find(r.nItem == 3 & r.IdentificationResp == 1))));
+        LocalisationTime_1item_4secs = nanmean(fRemoveOutliers(r.LocalisationTime(find(r.nItem == 1 & r.IdentificationResp == 1))));
+        LocalisationTime_3item_4secs = nanmean(fRemoveOutliers(r.LocalisationTime(find(r.nItem == 3 & r.IdentificationResp == 1))));
 
         % Compute misbinding rate using a permutation method (like OMT SERVER
         % SIMPLE)
@@ -115,6 +119,16 @@ for s = 1:numSubjects
 
     end
 end
+writetable(Q,fullfile('Results', 'result_OMTpavlovia.csv'));
+mkdir(fullfile('Results','OMT'));
+writetable(R,fullfile('Results','OMT','result_OMTpavlovia_trial.csv'));
+
+
+% JOIN with server data
+a = readtable(fullfile('Results','result_OMTserver.csv'));
+v = Q.Properties.VariableNames;
+v(strcmp(v,'screensize_OMT')) = [];
+a = a(:,v);
 
 % More checks like duplicates, task completion etc.
 % Check if there are any duplicates
@@ -150,140 +164,6 @@ else
     disp('No duplicates!')
 end
 
-writetable(Q,fullfile('Results', 'result_OMTpavlovia.csv'));
-mkdir(fullfile('Results','OMT'));
-writetable(R,fullfile('Results','OMT','result_OMTpavlovia_trial.csv'));
-
-
-
-% JOIN with server data
-a = readtable(fullfile('Results','result_OMTserver_here.csv'));
-for i = 1:height(a)
-    participantID = a.participantID{i};
-
-    try
-        participantID = strrep(participantID,'.','_');
-        participantID = strrep(participantID,'-','_');
-
-        participantID = strrep(participantID,'PLASMA','');
-        participantID = strrep(participantID,'plasma','');
-        participantID = strrep(participantID,'Plasma','');
-
-        participantID = strrep(participantID,'ST_','');
-        participantID = strrep(participantID,'st_','');
-        participantID = strrep(participantID,'ST','');
-        participantID = strrep(participantID,'st','');
-        participantID = strrep(participantID,'SR','');
-        participantID = strrep(participantID,'St','');
-
-        participantID = strrep(participantID,'\','');
-        participantID = strrep(participantID,'/','');
-
-        participantID = strrep(participantID,'p','P');
-        participantID = strrep(participantID,'c','C');
-        participantID = strrep(participantID,'v','');
-        participantID = strrep(participantID,'V','');
-        participantID = strrep(participantID,' ','');
-        participantID = strrep(participantID,'__','_');
-
-        participantID = strrep(participantID,'PlasmA_','');
-        participantID = strrep(participantID,'Plasm_','');
-        participantID = strrep(participantID,'C_','');
-
-
-        if strcmp(participantID(length(participantID)),'_')
-            participantID(length(participantID)) = [];
-        end
-    end
-
-    a.participantID{i} = participantID;
-end
-
-v = Q.Properties.VariableNames;
-v(strcmp(v,'screensize_OMT')) = [];
-a = a(:,v);
-
-
-% JOIN with server data
-a2 = readtable(fullfile('Results','result_OMTserver.csv'));
-for i = 1:height(a2)
-    participantID = a2.participantID{i};
-
-    try
-        participantID = strrep(participantID,'.','_');
-        participantID = strrep(participantID,'-','_');
-
-        participantID = strrep(participantID,'PLASMA','');
-        participantID = strrep(participantID,'plasma','');
-        participantID = strrep(participantID,'Plasma','');
-
-        participantID = strrep(participantID,'ST_','');
-        participantID = strrep(participantID,'st_','');
-        participantID = strrep(participantID,'ST','');
-        participantID = strrep(participantID,'st','');
-        participantID = strrep(participantID,'SR','');
-        participantID = strrep(participantID,'St','');
-
-        participantID = strrep(participantID,'\','');
-        participantID = strrep(participantID,'/','');
-
-        participantID = strrep(participantID,'p','P');
-        participantID = strrep(participantID,'c','C');
-        participantID = strrep(participantID,'v','');
-        participantID = strrep(participantID,'V','');
-        participantID = strrep(participantID,' ','');
-        participantID = strrep(participantID,'__','_');
-
-        participantID = strrep(participantID,'PlasmA_','');
-        participantID = strrep(participantID,'Plasm_','');
-        participantID = strrep(participantID,'C_','');
-
-
-        if strcmp(participantID(length(participantID)),'_')
-            participantID(length(participantID)) = [];
-        end
-    end
-
-    a2.participantID{i} = participantID;
-end
-a2 = a2(:,v);
-
-
-Q = Q(:,v);
-Q = [Q;a;a2];
-
-% More checks like duplicates, task completion etc.
-% Check if there are any duplicates
-sublist = Q.participantID;
-duplicates = table;
-uniqsublist  = unique(sublist);
-keepIdx = [];
-removeIdx = [];
-for s = 1:length(uniqsublist)
-    idx = find(strcmp(sublist,uniqsublist{s}));
-    if length(idx) == 1
-        keepIdx = [keepIdx; idx];
-    elseif length(idx) > 1
-        subject = {uniqsublist{s}};
-        duplicates = [duplicates; table(subject)];
-        a = Q(idx,:);
-
-        % Keep the first complete entry
-        [~,i] = min(a.testTime_OMT);
-        keepIdx = [keepIdx; idx(i)];
-
-        idx(i) = [];
-        removeIdx = [removeIdx; idx];
-    end
-end
-
-if ~isempty(duplicates)
-    duplicates
-end
-Q(removeIdx,:) = [];
-disp('Duplicates have been removed. Only first complete entry kept.');
-
-
 Q.OMT_ProportionCorrect = mean([Q.ProportionCorrect_1item_4secs,Q.ProportionCorrect_3item_4secs],2);
 Q.OMT_AbsoluteError = mean([Q.AbsoluteError_1item_4secs,Q.AbsoluteError_3item_4secs],2);
 Q.OMT_TargetDetection = mean([Q.Target_Simple_1item_4secs,Q.Target_Simple_3item_4secs],2);
@@ -295,6 +175,8 @@ Q.OMT_IdentificationTime = mean([Q.IdentificationTime_1item_4secs,Q.Identificati
 Q.OMT_LocalisationTime = mean([Q.LocalisationTime_1item_4secs,Q.LocalisationTime_3item_4secs],2);
 
 writetable(Q,fullfile('Results', 'result_OMT.csv'));
+
+
 
 
 

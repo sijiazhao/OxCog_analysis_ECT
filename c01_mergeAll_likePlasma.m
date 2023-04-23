@@ -1,9 +1,13 @@
 clear; close all;
-
-% O = readtable(fullfile('Results','result_OIS.csv'));O = O(:,1:11);
+groupName = 'ProlificControl';
 
 O = table;
-D = readtable(fullfile('demographic.csv'));
+D = readtable(fullfile('E:\GitHub\Masud_OxfordCognition\Project02_GiantProlific\demographics_oxcog_prolific','demographic_prolific.csv'));
+
+% Merge OIS and OIS2
+q = [readtable(fullfile('Results','result_OIS1.csv'));readtable(fullfile('Results','result_OIS2.csv'))];
+writetable(q,fullfile('Results','result_OIS.csv'));
+
 
 exptlist = {'REY','OIS','OMT','DSST','TMT','CORSI','TOL'};
 
@@ -14,27 +18,6 @@ for j = 1:length(exptlist)
     t = readtable(fullfile('ParameterNameList',['parameterList_task_' exptlist{j} '.xlsx']),'Sheet','all');
     plist = t.plist;
     typelist = t.typelist;
-
-
-    % Correct participant ID
-    t = readtable('E:\Dropbox (Neurological Conditions)\Plasma Biomarkers\sijiazhao_correctParticipantID_plasma.xlsx');
-    for s = 1:height(Q)
-        idx = find(strcmp(t.old, Q.participantID{s}));
-        if ~isempty(idx)
-            disp([Q.participantID{s} ' --> ' t.new{idx}]);
-            Q.participantID{s} = t.new{idx};
-        end
-    end
-
-    t = readtable('E:\Dropbox (Neurological Conditions)\Plasma Biomarkers\sijiazhao_rejectParticipantID_plasma.xlsx');
-    rejectList = [];
-    for s = 1:height(Q)
-        idx = find(strcmp(t.reject, Q.participantID{s}));
-        if ~isempty(idx)
-            rejectList = [rejectList; s];
-        end
-    end
-    Q(rejectList,:) = [];
 
     if j == 1
         O.participantID = Q.participantID;
@@ -91,46 +74,21 @@ for j = 1:length(exptlist)
     end
     %     filename = [filename '_' exptlist{j}];
 end
-
 t = O;
 for s = 1:height(t)
     idx = find(strcmp(D.participantID,t.participantID{s}));
     if ~isempty(idx)
         t.age(s) = D.age(idx);
         t.gender{s} = D.gender{idx};
-        t.group{s} = D.group{idx};
     else
         t.age(s) = nan;
-        t.gender{s} = 'unknown';
-        %         switch t.participantID{s}(1)
-        %             case 'P'
-        %                 t.group{s} = 'AD';
-        %             case 'C'
-        %                 t.group{s} = 'Control';
-        %             otherwise
-        t.group{s} = 'unknown';
-        %         end
+        t.gender{s} = 'Unknown';
     end
 end
 t = movevars(t,'gender','After','participantID');
 t = movevars(t,'age','After','participantID');
 O = t;
 
-
-
-for s = 1:height(O)
-    subject = O.participantID{s};
-    newstr = split(subject,'_');
-    O.cc_code{s} = newstr{1};
-    try
-        O.visit(s) = newstr{2};
-    catch
-        O.visit(s) = nan;
-    end
-end
+O.group = repmat({groupName},height(O),1);
 O = movevars(O,'group','Before','participantID');
-O = movevars(O,'visit','Before','participantID');
-O = movevars(O,'cc_code','After','participantID');
-O = sortrows(O,'visit','ascend');
-O = sortrows(O,"group","ascend");
-writetable(O,fullfile('OnlineTaskCompletionStatus_PlasmaProject.xlsx'));
+writetable(O,fullfile('all.csv'));
