@@ -1,0 +1,86 @@
+# Task order
+
+DSST
+ALF
+OMT
+OIS
+ALF-DELAYED
+
+TMT
+SRT
+CRT
+GNG
+
+Participant ID*
+
+__option:participantField
+
+Participant ID*
+
+__option:dialogText
+
+Press continue to start
+
+
+
+Start with https://run.pavlovia.org/sijiazhao/ect_dsst/?pid=HERE_IS_PARTICIPANT_ID
+
+Part 2 starts with https://run.pavlovia.org/sijiazhao/ect_tmt/?pid=HERE_IS_PARTICIPANT_ID
+
+### (2) Digit Symbol Substitution Test (DSST) (2 min)
+
+https://run.pavlovia.org/sijiazhao/ect_dsst
+
+OUTCOME: Number of correct matches. Hit rate.
+
+### (3) Wordlist Free Recall Memory task (5 min)
+
+https://run.pavlovia.org/sijiazhao/ect_alf
+
+### (4) Oxford Memory Test (OMT) (10 min)
+
+https://run.pavlovia.org/sijiazhao/ect_omt
+
+OUTCOME: This task yields a lot of useful measures. The key ones are proportion correct, location error, the rate that the stimulus is correctly identified and placed on the target location, the error rate that the participant misbinds one stimulus with the distractors. RT for identification, RT for localisation. These metrics for are available for both easy (1 fractal) condition and (3 fractal) condition.
+
+### (8) Object-in-Scene Memory Task (OIS) (12 min)
+
+https://run.pavlovia.org/sijiazhao/ect_ois
+
+### (9) Wordlist Free Recall Memory task - delayed recall (2 min)
+
+https://run.pavlovia.org/sijiazhao/ect_alf_delayed
+
+
+
+### (7) Trail-Making Task (TMT) (3-5 min)
+
+https://run.pavlovia.org/sijiazhao/ect_tmt
+
+### (1)  Simple Reaction Time (SRT) (~1.5 minutes) 
+
+https://run.pavlovia.org/sijiazhao/ect_srt
+
+Details: green button appears at the centre of the screen, and the subject needs to press the button as soon as possible. 60 trials, ITI randomised between 1 and 2s
+OUTCOME: Mean/median/SD of RTs.
+
+### (5) Choice Reaction Time (CRT) (2 minutes)  
+
+https://run.pavlovia.org/sijiazhao/ect_crt
+
+Details: An arrow appears at the centre of the screen. It is surrounded by a left button on the left and a right button on the right. The subject is instructed to press left if the arrow points to left, vice versa. 60 trials, ITI randomised between 1 and 2 s.
+OUTCOME: Mean/median/SD of correct RTs. Hit rate.
+
+### (6) Go-NoGo task (2 minutes) 
+
+https://run.pavlovia.org/sijiazhao/ect_gonogo
+Details: Go trials have a green button, and no go trials have a red button. Press when you see a green button, and don't press the red button. 80 trials in total, including 60 go and 20 nogo trials. ITI randomised between 1 and 2 s.
+OUTCOME: Mean/median/SD of RTs in correct go trials. False alarm rate.
+
+Go as fast as possible and don't press no go
+
+
+
+https://run.pavlovia.org/sijiazhao/ect_completion
+
+https://oxfordcognition.org/thank-you/
