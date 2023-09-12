@@ -1,0 +1,5 @@
+20230912
+remove fatigue rating in each task, just keep the start and the end
+ois
+omt
+add finger tapping in SRT?
