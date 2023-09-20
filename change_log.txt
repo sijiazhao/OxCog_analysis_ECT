@@ -1,5 +1,6 @@
 20230912
 remove fatigue rating in each task, just keep the start and the end
+dsst: no more end fatigue rating
 ois
-omt
+omt: new omt (from core project)
 add finger tapping in SRT?
