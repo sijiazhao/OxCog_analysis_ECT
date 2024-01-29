@@ -3,13 +3,24 @@ try
     addpath(genpath('E:\GitHub\Functions'));
 end
 
-path_root = 'E:\GitHub\Masud_OxfordCognition\Project13_ECT';
+if ismac
+    path_root = '/Users/sijiazhao/Documents/GitHub/Masud_OxfordCognition/ECT/';
+else
+    path_root = 'E:\GitHub\Masud_OxfordCognition\Project13_ECT';
+end
 
-alf_immediate = readtable(fullfile(path_root, 'ect_alf', 'results', 'a.csv')); alf_immediate = handleMultiEntry(alf_immediate);
-alf_delayed = readtable(fullfile(path_root, 'ect_alf_delayed', 'results', 'a.csv')); alf_delayed = handleMultiEntry(alf_delayed);
+mkdir('results');
 
-ois = readtable(fullfile(path_root, 'ect_ois', 'results', 'a.csv')); ois = handleMultiEntry(ois);
-omt = readtable(fullfile(path_root, 'ect_omt', 'results', 'a.csv')); omt = handleMultiEntry(omt);
+alf_immediate = readtable(fullfile(path_root, 'ect_alf', 'results', 'result_alf_immediate.csv')); alf_immediate = handleMultiEntry(alf_immediate);
+alf_delayed = readtable(fullfile(path_root, 'ect_alf_delayed', 'results', 'result_alf_delayed.csv')); alf_delayed = handleMultiEntry(alf_delayed);
+alf_delayed.ALF_nDelayedRecall = alf_delayed.nCorrect_freerecall_delayed;
+alf_delayed.ALF_pDelayedRecall = alf_delayed.propcorrect_recognise_delayed;
+alf_immediate.ALF_nImmediateRecall = alf_immediate.nCorrect_freerecall_1;
+alf_immediate.ALF_pImmediateRecall = alf_immediate.propcorrect_recognise_1;
+
+
+% ois = readtable(fullfile(path_root, 'ect_ois', 'results', 'ois.csv')); ois = handleMultiEntry(ois);
+omt = readtable(fullfile(path_root, 'ect_omt', 'results', 'omt.csv')); omt = handleMultiEntry(omt);
 
 tmt = readtable(fullfile(path_root, 'ect_tmt', 'results', 'a.csv')); tmt = handleMultiEntry(tmt);
 dsst = readtable(fullfile(path_root, 'ect_dsst', 'results', 'a.csv')); dsst = handleMultiEntry(dsst);
@@ -20,7 +31,8 @@ gonogo = readtable(fullfile(path_root, 'ect_gonogo', 'results', 'a.csv')); gonog
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % merge all tables
-taskList = {'dsst','alf_immediate','alf_delayed','ois','omt','tmt','srt','crt','gonogo'};
+% taskList = {'dsst','alf_immediate','alf_delayed','ois','omt','tmt','srt','crt','gonogo'};
+taskList = {'dsst','alf_immediate','alf_delayed','omt','tmt','srt','crt','gonogo'};
 if 0 % IF ONLY KEEP SUBJECTS WHO COMPLETED EVERYTHING
     alf = innerjoin(alf_immediate,alf_delayed,'LeftKeys',1,'RightKeys',1);
     q = alf;
@@ -31,18 +43,18 @@ if 0 % IF ONLY KEEP SUBJECTS WHO COMPLETED EVERYTHING
     end
 else
     q = table;
-
+    
     for j = 1:length(taskList)
         eval(['x = ' taskList{j} ';']);
         t = readtable(fullfile('ParameterNameList',['parameterList_task_' taskList{j} '.xlsx']));
         plist = t.plist;
         typelist = t.typelist;
-
+        
         if j == 1
             q.participantID_unique = x.participantID_unique;
-                    q.participantID = x.participantID;
+            q.participantID = x.participantID;
         end
-
+        
         for i  = 1:length(plist)
             switch typelist{i}
                 case 'num'
@@ -53,13 +65,13 @@ else
                     q.(plist{i}) = cell(size(q.participantID_unique));
             end
         end
-
+        
         for s = 1:size(x,1)
             idx = find(strcmp(q.participantID_unique, x.participantID_unique{s}));
             if ~isempty(idx)
                 q.participantID(idx) = x.participantID(s);
                 for i = 1:length(plist)
-
+                    
                     switch typelist{i}
                         case 'num'
                             q.(plist{i})(idx) = x.(plist{i})(s);
@@ -69,12 +81,12 @@ else
                             q.(plist{i}){idx} = x.(plist{i}){s};
                     end
                 end
-
+                
             else
                 idx2 = size(q,1) + 1;
                 columnName = q.Properties.VariableNames;
                 for i = 3:length(columnName)
-
+                    
                     try
                         q.(columnName{i})(idx2) = NaN;
                     end
@@ -85,12 +97,12 @@ else
                         q.(columnName{i}){idx2} = {};
                     end
                 end
-
+                
                 q.participantID_unique{idx2} = x.participantID_unique{s};
                 q.participantID{idx2} = x.participantID{s};
-
+                
                 for i = 1:length(plist)
-
+                    
                     try
                         q.(plist{i})(idx2) = x.(plist{i})(s);
                     end
@@ -100,14 +112,14 @@ else
                     try
                         q.(plist{i}){idx2} = x.(plist{i}){s};
                     end
-
+                    
                 end
             end
         end
     end
 end
 q = sortrows(q,"testTime_dsst","ascend");
-writetable(q,'OxCog_ECT.csv');
+writetable(q,fullfile('results','octal_ect.csv'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
