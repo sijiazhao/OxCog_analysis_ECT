@@ -18,21 +18,21 @@ alf_delayed.ALF_pDelayedRecall = alf_delayed.propcorrect_recognise_delayed;
 alf_immediate.ALF_nImmediateRecall = alf_immediate.nCorrect_freerecall_1;
 alf_immediate.ALF_pImmediateRecall = alf_immediate.propcorrect_recognise_1;
 
-
-% ois = readtable(fullfile(path_root, 'ect_ois', 'results', 'ois.csv')); ois = handleMultiEntry(ois);
+ois = readtable(fullfile(path_root, 'ect_ois', 'results', 'ois.csv')); ois = handleMultiEntry(ois);
 omt = readtable(fullfile(path_root, 'ect_omt', 'results', 'omt.csv')); omt = handleMultiEntry(omt);
 
 tmt = readtable(fullfile(path_root, 'ect_tmt', 'results', 'a.csv')); tmt = handleMultiEntry(tmt);
 dsst = readtable(fullfile(path_root, 'ect_dsst', 'results', 'a.csv')); dsst = handleMultiEntry(dsst);
+
 srt = readtable(fullfile(path_root, 'ect_srt', 'results', 'a.csv')); srt = handleMultiEntry(srt);
 crt = readtable(fullfile(path_root, 'ect_crt', 'results', 'a.csv')); crt = handleMultiEntry(crt);
 gonogo = readtable(fullfile(path_root, 'ect_gonogo', 'results', 'a.csv')); gonogo = handleMultiEntry(gonogo);
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % merge all tables
-% taskList = {'dsst','alf_immediate','alf_delayed','ois','omt','tmt','srt','crt','gonogo'};
-taskList = {'dsst','alf_immediate','alf_delayed','omt','tmt','srt','crt','gonogo'};
+taskList = {'dsst','alf_immediate','alf_delayed','ois','omt','tmt','srt','crt','gonogo'};
+% taskList = {'dsst','alf_immediate','alf_delayed','ois','omt','tmt'};
+
 if 0 % IF ONLY KEEP SUBJECTS WHO COMPLETED EVERYTHING
     alf = innerjoin(alf_immediate,alf_delayed,'LeftKeys',1,'RightKeys',1);
     q = alf;
@@ -43,35 +43,35 @@ if 0 % IF ONLY KEEP SUBJECTS WHO COMPLETED EVERYTHING
     end
 else
     q = table;
-    
+
     for j = 1:length(taskList)
         eval(['x = ' taskList{j} ';']);
         t = readtable(fullfile('ParameterNameList',['parameterList_task_' taskList{j} '.xlsx']));
         plist = t.plist;
         typelist = t.typelist;
-        
+
         if j == 1
-            q.participantID_unique = x.participantID_unique;
+            q.entryID = x.entryID;
             q.participantID = x.participantID;
         end
-        
+
         for i  = 1:length(plist)
             switch typelist{i}
                 case 'num'
-                    q.(plist{i}) = nan(size(q.participantID_unique));
+                    q.(plist{i}) = nan(size(q.entryID));
                 case 'time'
-                    q.(plist{i}) = NaT(size(q.participantID_unique));
+                    q.(plist{i}) = NaT(size(q.entryID));
                 case 'cell'
-                    q.(plist{i}) = cell(size(q.participantID_unique));
+                    q.(plist{i}) = cell(size(q.entryID));
             end
         end
-        
+
         for s = 1:size(x,1)
-            idx = find(strcmp(q.participantID_unique, x.participantID_unique{s}));
+            idx = find(strcmp(q.entryID, x.entryID{s}));
             if ~isempty(idx)
                 q.participantID(idx) = x.participantID(s);
                 for i = 1:length(plist)
-                    
+
                     switch typelist{i}
                         case 'num'
                             q.(plist{i})(idx) = x.(plist{i})(s);
@@ -81,12 +81,12 @@ else
                             q.(plist{i}){idx} = x.(plist{i}){s};
                     end
                 end
-                
+
             else
                 idx2 = size(q,1) + 1;
                 columnName = q.Properties.VariableNames;
                 for i = 3:length(columnName)
-                    
+
                     try
                         q.(columnName{i})(idx2) = NaN;
                     end
@@ -97,12 +97,12 @@ else
                         q.(columnName{i}){idx2} = {};
                     end
                 end
-                
-                q.participantID_unique{idx2} = x.participantID_unique{s};
+
+                q.entryID{idx2} = x.entryID{s};
                 q.participantID{idx2} = x.participantID{s};
-                
+
                 for i = 1:length(plist)
-                    
+
                     try
                         q.(plist{i})(idx2) = x.(plist{i})(s);
                     end
@@ -112,14 +112,14 @@ else
                     try
                         q.(plist{i}){idx2} = x.(plist{i}){s};
                     end
-                    
+
                 end
             end
         end
     end
 end
 q = sortrows(q,"testTime_dsst","ascend");
-writetable(q,fullfile('results','octal_ect.csv'));
+writetable(q,fullfile('results','ect_01_octal.csv'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -131,16 +131,20 @@ y = table;
 for s = 1:length(sublist)
     xx = x(find(strcmp(x.participantID,sublist{s})),:);
     if height(xx) == 1
-        xx.participantID_unique = {[sublist{s} '_1']};
+        xx.entryID = {[sublist{s}]};
     else
         % lookfor testTime's column
         xx = sortrows(xx,find(contains(xx.Properties.VariableNames,"testTime")),"ascend");
         for ii = 1:height(xx)
-            xx.participantID_unique{ii} = [sublist{s} '_' num2str(ii)];
+            if ii == 1
+                xx.entryID{ii} = [sublist{s}];
+            else
+                xx.entryID{ii} = [sublist{s} '_' num2str(ii)];
+            end
         end
     end
     y = [y; xx];
 end
-y = movevars(y, "participantID_unique", "Before", 1);
+y = movevars(y, "entryID", "Before", 1);
 % alf_immediate = y;
 end
